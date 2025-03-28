@@ -1,7 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import './CartItem.css';
 
 export const CartSlice = createSlice({
   name: 'cart',
@@ -10,24 +7,29 @@ export const CartSlice = createSlice({
   },
   reducers: {
     addItem: (state, action) => {
-      const { name, image, cost } = action.payload;
-      const existingItem = state.items.find(item => item.name === name);
-      if (existingItem) {
-        existingItem.quantity++;
+      // Check if the item already exists in the cart.
+      const itemIndex = state.items.findIndex(
+        (item) => item.name === action.payload.name
+      );
+      if (itemIndex !== -1) {
+        // If found, increment its quantity.
+        state.items[itemIndex].quantity += 1;
       } else {
-        state.items.push({ name, image, cost, quantity: 1 });
+        // If not, add the new item with a quantity of 1.
+        state.items.push({ ...action.payload, quantity: 1 });
       }
     },
-
     removeItem: (state, action) => {
-      state.items = state.items.filter(item => item.name !== action.payload);
+      // Remove the item from the cart based on its name.
+      state.items = state.items.filter((item) => item.name !== action.payload);
     },
-
     updateQuantity: (state, action) => {
+      // Extract the name and new quantity from the payload.
       const { name, quantity } = action.payload;
-      const itemToUpdate = state.items.find(item => item.name === name);
-      if (itemToUpdate) {
-        itemToUpdate.quantity = quantity;
+      // Find the item and update its quantity if it exists.
+      const item = state.items.find((item) => item.name === name);
+      if (item) {
+        item.quantity = quantity;
       }
     },
   },
